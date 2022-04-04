@@ -1,0 +1,8 @@
+wandb:
+  _target_: pytorch_lightning.loggers.wandb.WandbLogger
+  project: 'Abnormal_Detection'
+  name: ${run_name}
+  save_dir: "."
+#  sync_step: False
+  offline: False # set True to store all logs only locally
+  tags: ${tags}

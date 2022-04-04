@@ -1,0 +1,17 @@
+# @package _global_
+defaults:
+  - dataloader: baseloader
+  - framework: basemodel
+  - logger: none
+  - hydra: default.yaml
+  - callbacks:
+    - none
+  - trainer: default.yaml
+
+seed: 255
+work_dir: ${hydra:runtime.cwd}
+run_name: default_name
+tags: []
+
+wandb_api_key:  ${oc.env:wandb_api_key}
+data_dir: ${oc.env:data_dir}
