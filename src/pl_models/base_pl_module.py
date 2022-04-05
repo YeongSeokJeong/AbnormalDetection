@@ -1,6 +1,7 @@
 import pytorch_lightning as pl
 from torch.optim import Adam
 import torch
+from sklearn.metrics import f1_score
 
 
 class BasePlModule(pl.LightningModule):
@@ -23,10 +24,10 @@ class BasePlModule(pl.LightningModule):
         pred = self.forward(img)
         loss = self.train_loss(pred, label)
 
-        acc = sum(torch.argmax(pred, dim=1) == label)
+        acc = sum(torch.argmax(pred, dim=1) == label)/len(img)
 
-        self.log('train/loss', loss)
-        self.log('train/acc', acc)
+        self.log('train/loss', loss, prog_bar=True, on_epoch=True)
+        self.log('train/acc', acc, on_epoch=True)
         return loss
 
     def validation_step(self, batch, batch_idx):
@@ -34,8 +35,18 @@ class BasePlModule(pl.LightningModule):
         pred = self.forward(img)
         loss = self.valid_loss(pred, label)
 
-        acc = sum(torch.argmax(pred, dim=1) == label)
+        acc = sum(torch.argmax(pred, dim=1) == label)/len(img)
 
-        self.log('valid/loss', loss)
-        self.log('valid/acc', acc)
-        return loss
+        self.log('valid/loss', loss, prog_bar=True, on_epoch=True)
+        self.log('valid/acc', acc, on_epoch=True)
+        return torch.argmax(pred, dim=1), label, loss
+
+    def validation_step_end(self, output_list):
+        valid_pred = output_list[0]
+        valid_label = output_list[1]
+        valid_f1_score = f1_score(valid_label.detach().cpu().numpy(),
+                                  valid_pred.detach().cpu().numpy(),
+                                  average='macro')
+        self.log('valid/f1_score', valid_f1_score)
+
+

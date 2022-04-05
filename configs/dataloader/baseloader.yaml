@@ -9,8 +9,8 @@ defaults:
 datasets:
   _target_: src.dataloader.base_dataset.BaseDataLoader
   data_root: ${data_dir}
-  batch_size: 8
-  num_workers: 0
+  batch_size: ${batch_size}
+  num_workers: ${num_workers}
   fold_num: 0
   seed: ${seed}
 

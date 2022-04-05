@@ -29,6 +29,7 @@ def train(config: DictConfig):
     if "logger" in config:
         for _, lg_conf in config["logger"].items():
             if "_target_" in lg_conf:
+                lg_conf['name'] = str(lg_conf['name'])
                 logger.append(hydra.utils.instantiate(lg_conf))
         if any([isinstance(l, WandbLogger) for l in logger]):
             utils.wandb_login(key=config.wandb_api_key)
@@ -38,11 +39,11 @@ def train(config: DictConfig):
     )
 
 
-    # utils.log_hyperparameters(
-    #     config=config,
-    #     model=model,
-    #     trainer=trainer,
-    # )
+    utils.log_hyperparameters(
+        config=config,
+        model=model,
+        trainer=trainer,
+    )
 
     for l in [l for l in logger if isinstance(l, WandbLogger)]:
         l.watch(model=model, log='all', log_freq=25)

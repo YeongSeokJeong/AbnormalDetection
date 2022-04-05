@@ -8,10 +8,20 @@ defaults:
     - none
   - trainer: default.yaml
 
+model_name: resnet50
+num_linear: 1
+lr: 0.00005
+
+batch_size: 16
+num_workers: 0
+
 seed: 255
+run_name: ${model_name}
 work_dir: ${hydra:runtime.cwd}
-run_name: default_name
-tags: []
+
+tags:
+  - ${model_name}
+  - num_linear_${num_linear}
 
 wandb_api_key:  ${oc.env:wandb_api_key}
 data_dir: ${oc.env:data_dir}
