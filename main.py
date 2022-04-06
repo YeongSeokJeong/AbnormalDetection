@@ -9,6 +9,7 @@ from typing import List
 from src import utils
 
 dotenv.load_dotenv(override=True)
+OmegaConf.register_new_resolver('eval', lambda x: eval(x))
 
 
 def train(config: DictConfig):
@@ -19,6 +20,7 @@ def train(config: DictConfig):
         pl.seed_everything(config['seed'])
 
     model = hydra.utils.instantiate(config['framework'])
+    ## callbacks
     callbacks: List[pl.Callback] = []
     if "callbacks" in config:
         for _, cb_conf in config["callbacks"].items():
@@ -29,7 +31,6 @@ def train(config: DictConfig):
     if "logger" in config:
         for _, lg_conf in config["logger"].items():
             if "_target_" in lg_conf:
-                lg_conf['name'] = str(lg_conf['name'])
                 logger.append(hydra.utils.instantiate(lg_conf))
         if any([isinstance(l, WandbLogger) for l in logger]):
             utils.wandb_login(key=config.wandb_api_key)
@@ -43,6 +44,8 @@ def train(config: DictConfig):
         config=config,
         model=model,
         trainer=trainer,
+        callbacks=callbacks,
+        logger=logger
     )
 
     for l in [l for l in logger if isinstance(l, WandbLogger)]:
@@ -50,7 +53,9 @@ def train(config: DictConfig):
 
     trainer.fit(model=model, train_dataloaders=train_loader, val_dataloaders=valid_loader)
 
-    utils.finish(logger)
+    utils.finish(
+        logger=logger
+    )
 
     optimized_metric = config.get("optimized_metric")
     if optimized_metric:

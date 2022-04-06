@@ -6,17 +6,14 @@ from pytorch_lightning.loggers.wandb import WandbLogger
 from pytorch_lightning.utilities import rank_zero_only
 import pytorch_lightning as pl
 
-def wandb_login(key):
-    wandb.login(key=key)
-
-def empty(*args, **kwargs):
-    pass
 
 @rank_zero_only
 def log_hyperparameters(
         config: DictConfig,
         model: pl.LightningModule,
         trainer: pl.Trainer,
+        callbacks: List[pl.Callback],
+        logger: List[pl.loggers.LightningLoggerBase],
 ) -> None:
     """This method controls which parameters from Hydra config are saved by Lightning loggers.
     Additionaly saves:
@@ -49,6 +46,13 @@ def log_hyperparameters(
     # since we already did that above
     trainer.logger.log_hyperparams = empty
 
+def empty(*args, **kwargs):
+    pass
+
+import wandb
+
+def wandb_login(key):
+    wandb.login(key=key)
 
 def finish(
         logger: List[pl.loggers.LightningLoggerBase],
