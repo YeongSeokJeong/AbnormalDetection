@@ -49,3 +49,13 @@ def log_hyperparameters(
     # since we already did that above
     trainer.logger.log_hyperparams = empty
 
+
+def finish(
+        logger: List[pl.loggers.LightningLoggerBase],
+) -> None:
+    """Makes sure everything closed properly."""
+
+    # without this sweeps with wandb logger might crash!
+    for lg in logger:
+        if isinstance(lg, WandbLogger):
+            wandb.finish()

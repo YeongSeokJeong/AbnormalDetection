@@ -50,6 +50,11 @@ def train(config: DictConfig):
 
     trainer.fit(model=model, train_dataloaders=train_loader, val_dataloaders=valid_loader)
 
+    utils.finish(logger)
+
+    optimized_metric = config.get("optimized_metric")
+    if optimized_metric:
+        return trainer.callback_metrics[optimized_metric]
 
 
 @hydra.main('configs/','train.yaml')
