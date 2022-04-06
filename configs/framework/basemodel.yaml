@@ -3,7 +3,7 @@ model:
   _target_: src.models.pretrained_models.PretrainedModel
   model_name: ${model_name}
   num_layers: ${num_linear}
-  dropout_ratio: 0.8
+  dropout_ratio: 0.2
 lr: ${lr}
 train_loss:
   _target_: torch.nn.CrossEntropyLoss

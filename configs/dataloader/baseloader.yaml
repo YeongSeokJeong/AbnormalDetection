@@ -12,6 +12,7 @@ datasets:
   batch_size: ${batch_size}
   num_workers: ${num_workers}
   fold_num: 0
+  resolution: 224
   seed: ${seed}
 
 

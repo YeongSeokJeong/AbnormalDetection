@@ -11,14 +11,14 @@ import torch
 
 
 class BaseDataset(Dataset):
-    def __init__(self, X, Y, aug_functions: Dict, data_root, is_test=False):
+    def __init__(self, X, Y, aug_functions: Dict, data_root, resolution, is_test=False):
         super(BaseDataset, self).__init__()
         self.is_test = is_test
         self.data_root = data_root
         self.to_tf = torchvision.transforms.ToTensor()
         aug_functions = [augmentation for key, augmentation in aug_functions.items()]
         aug_functions.append(
-            torchvision.transforms.Resize([224,224])
+            torchvision.transforms.Resize([resolution, resolution])
         )
         self.transforms = torchvision.transforms.Compose(aug_functions)
 
@@ -52,11 +52,13 @@ class BaseDataset(Dataset):
 
 
 class BaseDataLoader(object):
-    def __init__(self, data_root, train_augs, valid_augs, batch_size, num_workers=0, fold_num: int = 0, seed=255, is_test=False):
+    def __init__(self, data_root, train_augs, valid_augs, resolution,
+                 batch_size, num_workers=0, fold_num: int = 0, seed=255, is_test=False):
         super(BaseDataLoader, self).__init__()
         assert fold_num < 5, ValueError
         self.data_root = data_root
         self.label_idx = self.get_label_idx()
+        self.resolution = resolution
         self.is_test = is_test
 
         self.batch_size = batch_size
@@ -88,12 +90,12 @@ class BaseDataLoader(object):
         return label_idx
 
     def get_train_valid_dataloaders(self):
-        train_dataset = BaseDataset(self.train_x, self.train_y, self.train_augs, self.data_root)
-        valid_dataset = BaseDataset(self.valid_x, self.valid_y, self.valid_augs, self.data_root)
+        train_dataset = BaseDataset(self.train_x, self.train_y, self.train_augs, self.data_root, self.resolution)
+        valid_dataset = BaseDataset(self.valid_x, self.valid_y, self.valid_augs, self.data_root, self.resolution)
 
         return DataLoader(train_dataset, self.batch_size, True, num_workers=self.num_workers),\
                DataLoader(valid_dataset, self.batch_size, False, num_workers=self.num_workers)
 
     def get_test_dataloaders(self):
-        test_dataset = BaseDataset(self.X, None, self.train_augs, self.data_root, self.is_test)
+        test_dataset = BaseDataset(self.X, None, self.train_augs, self.data_root, self.resolution, self.is_test)
         return DataLoader(test_dataset, self.batch_size, False, num_workers=self.num_workers)
