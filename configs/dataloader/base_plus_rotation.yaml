@@ -1,0 +1,20 @@
+defaults:
+  - augmentation@datasets.train_augs:
+      - horizontalflip
+      - verticalflip
+      - rotation
+      - normalize
+  - augmentation@datasets.valid_augs:
+      - rotation
+      - normalize
+
+datasets:
+  _target_: src.dataloader.base_dataset.BaseDataLoader
+  data_root: ${data_dir}
+  batch_size: ${batch_size}
+  num_workers: ${num_workers}
+  fold_num: 0
+  resolution: 224
+  seed: ${seed}
+
+

@@ -5,7 +5,7 @@ defaults:
   - override /framework: basemodel
   - override /logger: none
   - override /hydra: default
-  - override /callbacks: none
+  - override /callbacks: modelcheckpoint
   - override /trainer: default
 
 model_name: densenet161
