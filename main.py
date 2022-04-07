@@ -16,8 +16,8 @@ def train(config: DictConfig):
     datasets = hydra.utils.instantiate(config['dataloader']['datasets'])
     train_loader, valid_loader = datasets.get_train_valid_dataloaders()
 
-    if "seed" in config:
-        pl.seed_everything(config['seed'])
+    # if "seed" in config:
+    #     pl.seed_everything(config['seed'])
 
     model = hydra.utils.instantiate(config['framework'])
     ## callbacks

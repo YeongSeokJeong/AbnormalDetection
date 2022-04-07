@@ -49,4 +49,8 @@ class BasePlModule(pl.LightningModule):
                                   average='macro')
         self.log('valid/f1_score', valid_f1_score)
 
-
+    def predict_step(self, batch, batch_idx, dataloader_idx=None):
+        img_idx, img = batch
+        pred = self.forward(img)
+        pred = torch.softmax(pred, dim=-1)
+        return img_idx, pred

@@ -48,7 +48,9 @@ class BaseDataset(Dataset):
             label = self.label[idx]
             return img, torch.tensor(label, dtype=torch.int64)
         else:
-            return img
+            img_idx = int(path.replace('\\', '/').split('/')[-1].split('.')[0])
+            img_idx = img_idx % 20000
+            return str(img_idx), img
 
 
 class BaseDataLoader(object):
@@ -57,7 +59,7 @@ class BaseDataLoader(object):
         super(BaseDataLoader, self).__init__()
         assert fold_num < 5, ValueError
         self.data_root = data_root
-        self.label_idx = self.get_label_idx()
+        self.label_idx = self.get_label2idx()
         self.resolution = resolution
         self.is_test = is_test
 
@@ -82,12 +84,17 @@ class BaseDataLoader(object):
                     break
         else:
             dataframe = pd.read_csv(f'{data_root}/test_df.csv')
-            self.X = dataframe['file_name'].to_numpy()
+            self.X = [os.path.join('test', file_name) for file_name in dataframe['file_name'].to_numpy()]
 
-    def get_label_idx(self):
+    def get_label2idx(self):
         label_df = pd.read_csv(f'{self.data_root}/train_df.csv')
-        label_idx = {label: i for i, label in enumerate(sorted(list(set(label_df['label']))))}
-        return label_idx
+        label2idx = {label: i for i, label in enumerate(sorted(list(set(label_df['label']))))}
+        return label2idx
+
+    def get_idx2label(self):
+        label_df = pd.read_csv(f'{self.data_root}/train_df.csv')
+        idx2label = {i: label for i, label in enumerate(sorted(list(set(label_df['label']))))}
+        return idx2label
 
     def get_train_valid_dataloaders(self):
         train_dataset = BaseDataset(self.train_x, self.train_y, self.train_augs, self.data_root, self.resolution)
