@@ -5,7 +5,6 @@ defaults:
       - rotation
       - normalize
   - augmentation@datasets.valid_augs:
-      - rotation
       - normalize
 
 datasets:
